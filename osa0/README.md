@@ -1,6 +1,8 @@
 <h1>0.4</h1>
 Dialog between server and browser when saving a note on https://studies.cs.helsinki.fi/exampleapp
+
 ```mermaid
+
 sequenceDiagram
     participant B as browser
     participant S as server
@@ -32,7 +34,9 @@ sequenceDiagram
 
 <h1>0.5</h1>
 Dialog between server and browser when opening https://studies.cs.helsinki.fi/exampleapp/spa
+
 ```mermaid
+
 sequenceDiagram
     participant B as browser
     participant S as server
@@ -55,12 +59,15 @@ sequenceDiagram
     S -->> B: json file
     deactivate S
     Note right of B: browser executes function in js file to draw notes on the screen
+
 ```
 
 
 <h1>0.6</h1>
 Dialog between server and browser when saving a note on https://studies.cs.helsinki.fi/exampleapp/spa
+
 ```mermaid
+
 sequenceDiagram
     participant B as browser
     participant S as server
