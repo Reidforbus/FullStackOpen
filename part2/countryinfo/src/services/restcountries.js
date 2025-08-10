@@ -1,10 +1,13 @@
 import axios from 'axios'
 
-const baseUrl = 'https://studies.cs.helsinki.fi/restcountries'
+const baseUrl = 'https://studies.cs.helsinki.fi/restcountries/api'
 
-const get = (searchstr) => {
-    const request = axios.get(`${baseUrl}/name/${searchstr}`)
-    return request.then(response => response.data)
+const getCountry = (searchstr) => {
+    return  axios.get(`${baseUrl}/name/${searchstr}`)
 }
 
-export default {get}
+const getAll = () => {
+    return  axios.get(`${baseUrl}/all`)
+}
+
+export default {getAll, getCountry}
