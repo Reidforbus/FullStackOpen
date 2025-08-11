@@ -50,27 +50,28 @@ const App = () => {
                     const person = {
                         name: newName,
                         number: newNumber,
-                        id: `${id}`
+                        id: id
                     }
                     phonebookService
                         .update(id, person)
-                        .then(data => {
-                            console.log(`Updated ${data.name}`)
+                        .then(result => {
+                            console.log(result)
                             setErrorMessage({
-                                body: `Updated number for ${data.name}`,
+                                body: `Updated number for ${person.name}`,
                                 class: 'note'
                             })
                             setTimeout(() => {
                                 setErrorMessage(null)
                             },4000)
                             setPersons(persons.map(pers => {
-                                if (pers.id !== data.id) {
+                                if (pers.id !== id) {
                                     return pers
                                 }
-                                return data
+                                return person
                             }))
                         })
                         .catch(error => {
+                            console.log(error)
                             setErrorMessage({
                                 body: `Could not update information. Perhaps information was deleted from server elsewhere?`,
                                 class: 'error'
@@ -111,7 +112,7 @@ const App = () => {
         setFilterstr(event.target.value)
     }
 
-    //deletes persons from json
+    //deletes person
     const handleDelete = (event) => {
         const id = event.target.id
         const name = persons.find(pers => pers.id === id).name
@@ -119,10 +120,9 @@ const App = () => {
             phonebookService
                 .remove(id)
                 .then(data => {
-                    console.log(`Deleted ${data.name}, id:${data.id}`)
-                    setPersons(persons.filter(pers => pers.id !== data.id))
+                    setPersons(persons.filter(pers => pers.id !== id))
                     setErrorMessage({
-                        body: `Deleted ${data.name}`,
+                        body: `Deleted ${name}`,
                         class: 'note'
                     })
                     setTimeout(() => {
@@ -130,6 +130,7 @@ const App = () => {
                     }, 4000)
                 })
                 .catch(error => {
+                    console.log(error.message)
                     setErrorMessage({
                         body: `Information of ${name} has already been removed from the server`,
                         class: 'error'
