@@ -16,8 +16,20 @@ mongoose.connect(db_url)
     })
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+    name: {
+        type: String,
+        minLength: [3, 'must be at least 3 characters long'],
+        required: true
+    },
+    number: {
+        type: String,
+        validate: {
+            validator: (val) => {
+                return val.length >= 8 && /^\d{2,3}-\d*$/.test(val) 
+            },
+            message: () => 'Number has to be of format: XXX-XXXX, and at least 8 long'
+        }
+    },
 })
 
 personSchema.set('toJSON', {

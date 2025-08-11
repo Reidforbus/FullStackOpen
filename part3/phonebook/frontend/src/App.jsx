@@ -36,6 +36,7 @@ const App = () => {
 
                     })
                     .catch(error => {
+                        console.log(error)
                         setErrorMessage({ 
                             body: `Could not add new: ${error.response.data.error}`,
                             class: 'error'
@@ -73,7 +74,7 @@ const App = () => {
                         .catch(error => {
                             console.log(error)
                             setErrorMessage({
-                                body: `Could not update information. Perhaps information was deleted from server elsewhere?`,
+                                body: `Could not update information: ${error.response.data.error}`,
                                 class: 'error'
                             })
                             setTimeout(() => {
