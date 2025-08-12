@@ -55,121 +55,167 @@ beforeEach(async () => {
 })
 
 describe('blogs api', () => {
-    test('Correct number of blogs are returned', async () => {
-        const response = await api
-            .get('/api/blogs')
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
+    describe('getting blogs', () => {
+        test('Correct number of blogs are returned', async () => {
+            const response = await api
+                .get('/api/blogs')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
 
-        assert.strictEqual(response.body.length, 6)
+            assert.strictEqual(response.body.length, 6)
+        })
+
+        test('returned object contains id field', async () => {
+            const response = await api
+                .get('/api/blogs')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+
+            assert.notStrictEqual(response.body[0].id, undefined)
+        })
     })
 
-    test('returned object contains id field', async () => {
-        const response = await api
-            .get('/api/blogs')
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
+    describe('adding a blog', () => {
+        test('POST request adds a blog ', async () => {
+            const new_blog = {
+                title: "Tech won't save us",
+                author: "Paris Marks",
+                url: "https://techwontsave.us",
+                likes: 5,
+            }
 
-        assert.notStrictEqual(response.body[0].id, undefined)
+            const response = await api
+                .post('/api/blogs')
+                .send(new_blog)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
+
+            delete response.body.id
+            assert.deepStrictEqual(response.body, new_blog)
+
+            const response2 = await api
+                .get('/api/blogs')
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+            assert.strictEqual(response2.body.length, 7)
+
+        })
+        test('missing likes defaults to 0', async () => {
+            const new_blog = {
+                title: "Tech won't save us",
+                author: "Paris Marks",
+                url: "https://techwontsave.us",
+            }
+            const response = await api
+                .post('/api/blogs')
+                .send(new_blog)
+                .expect(201)
+                .expect('Content-Type', /application\/json/)
+
+            assert.strictEqual(response.body.likes, 0)
+        })
+
+        test('missing title returns 404', async () => {
+            const new_blog = {
+                author: "Paris Marks",
+                url: "https://techwontsave.us",
+                likes: 5,
+            }
+
+            const response = await api
+                .post('/api/blogs')
+                .send(new_blog)
+                .expect(400)
+        })
+
+        test('missing url returns 404', async () => {
+            const new_blog = {
+                title: "Tech won't save us",
+                author: "Paris Marks",
+                likes: 5,
+            }
+
+            const response = await api
+                .post('/api/blogs')
+                .send(new_blog)
+                .expect(400)
+        })
     })
 
-    test('POST request adds a blog ', async () => {
-        const new_blog = {
-            title: "Tech won't save us",
-            author: "Paris Marks",
-            url: "https://techwontsave.us",
-            likes: 5,
-        }
+    describe('deleting a blog', () => {
+        test('that exists succeeds', async () => {
+            const blog = await Blog.findOne()
+            const id = blog.id
+            assert.notStrictEqual(id, undefined)
 
-        const response = await api
-            .post('/api/blogs')
-            .send(new_blog)
-            .expect(201)
-            .expect('Content-Type', /application\/json/)
+            const response = await api
+                .delete(`/api/blogs/${id}`)
+                .expect(204)
 
-        delete response.body.id
-        assert.deepStrictEqual(response.body, new_blog)
+            const result = await Blog.findById(id)
+            assert.strictEqual(result, null)
+        })
 
-        const response2 = await api
-            .get('/api/blogs')
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
-        assert.strictEqual(response2.body.length, 7)
+        test('that doesnt exist doesnt alter db', async () => {
+            const id = await nonExistingBlogId()
 
+            const state1 = await Blog.find({})
+
+            const response = await api
+                .delete(`/api/blogs/${id}`)
+                .expect(204)
+
+            const state2 = await Blog.find({})
+
+            assert.deepStrictEqual(state1, state2)
+
+        })
+
+        test('with invalid id fails', async () => {
+            const response = await api
+                .delete('/api/blogs/abcdefg')
+                .expect(400)
+        })
     })
 
-    test('missing likes defaults to 0', async () => {
-        const new_blog = {
-            title: "Tech won't save us",
-            author: "Paris Marks",
-            url: "https://techwontsave.us",
-        }
-        const response = await api
-            .post('/api/blogs')
-            .send(new_blog)
-            .expect(201)
-            .expect('Content-Type', /application\/json/)
+    describe('updating a blog', () => {
+        test.only('that exists succeeds', async () => {
+            const blog = await Blog.findOne()
+            const id = blog.id
+            const new_likes = { likes: 321 }
+            assert.notStrictEqual(id, undefined)
 
-        assert.strictEqual(response.body.likes, 0)
-    })
+            const response = await api
+                .put(`/api/blogs/${id}`)
+                .send(new_likes)
+                .expect(204)
 
-    test('missing title returns 404', async () => {
-        const new_blog = {
-            author: "Paris Marks",
-            url: "https://techwontsave.us",
-            likes: 5,
-        }
+            const result = await Blog.findOne({ likes: 321 })
+            assert.notStrictEqual(result, null)
+        })
 
-        const response = await api
-            .post('/api/blogs')
-            .send(new_blog)
-            .expect(400)
-    })
+        test.only('that doesnt exist doesnt alter db', async () => {
+            const id = await nonExistingBlogId()
+            const new_likes = { likes: 321 }
 
-    test('missing url returns 404', async () => {
-        const new_blog = {
-            title: "Tech won't save us",
-            author: "Paris Marks",
-            likes: 5,
-        }
+            const state1 = await Blog.find({})
 
-        const response = await api
-            .post('/api/blogs')
-            .send(new_blog)
-            .expect(400)
-    })
 
-    test('deleting a blog succeeds', async () => {
-        const blog = await Blog.findOne()
-        const id = blog.id
+            const response = await api
+                .put(`/api/blogs/${id}`)
+                .send(new_likes)
+                .expect(204)
 
-        const response = await api
-            .delete(`/api/blogs/${id}`)
-            .expect(204)
+            const state2 = await Blog.find({})
 
-        const result = await Blog.findById(id)
-        assert.strictEqual(result, null)
-    })
+            assert.deepStrictEqual(state1, state2)
+        })
 
-    test('deleting non existant blog doesnt alter db', async () => {
-        const id = await nonExistingBlogId()
-
-        const result1 = await Blog.find({})
-
-        const response = await api
-            .delete(`/api/blogs/${id}`)
-            .expect(204)
-
-        const result2 = await Blog.find({})
-
-        assert.deepStrictEqual(result1, result2)
-
-    })
-
-    test('deleting with invalid id fails', async () => {
-        const response = await api
-            .delete('/api/blogs/abcdefg')
-            .expect(400)
+        test.only('with invalid id fails', async () => {
+            const response = await api
+                .put('/api/blogs/abcdefg')
+                .expect(400)
+        })
     })
 })
 
