@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blogs')
+const { nonExistingBlogId } = require('./test_helper')
 
 const api = supertest(app)
 
@@ -135,6 +136,39 @@ describe('blogs api', () => {
         const response = await api
             .post('/api/blogs')
             .send(new_blog)
+            .expect(400)
+    })
+
+    test('deleting a blog succeeds', async () => {
+        const blog = await Blog.findOne()
+        const id = blog.id
+
+        const response = await api
+            .delete(`/api/blogs/${id}`)
+            .expect(204)
+
+        const result = await Blog.findById(id)
+        assert.strictEqual(result, null)
+    })
+
+    test('deleting non existant blog doesnt alter db', async () => {
+        const id = await nonExistingBlogId()
+
+        const result1 = await Blog.find({})
+
+        const response = await api
+            .delete(`/api/blogs/${id}`)
+            .expect(204)
+
+        const result2 = await Blog.find({})
+
+        assert.deepStrictEqual(result1, result2)
+
+    })
+
+    test('deleting with invalid id fails', async () => {
+        const response = await api
+            .delete('/api/blogs/abcdefg')
             .expect(400)
     })
 })
