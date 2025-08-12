@@ -4,9 +4,9 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
-const { nonExistingBlogId } = require('./test_helper')
+const { nonExistingBlogId, testAuth } = require('./test_helper')
 
-const api = supertest(app)
+const api = supertest.agent(app)
 
 const sampleBlogs = [
     {
@@ -54,6 +54,7 @@ beforeEach(async () => {
     await Promise.all(promises)
 })
 
+
 describe('blogs api', () => {
     describe('getting blogs', () => {
         test('Correct number of blogs are returned', async () => {
@@ -76,6 +77,21 @@ describe('blogs api', () => {
     })
 
     describe('adding a blog', () => {
+        test('without a token fails', async () => {
+            const new_blog = {
+                title: "Tech won't save us",
+                author: "Paris Marks",
+                url: "https://techwontsave.us",
+                likes: 5,
+            }
+
+            await api
+                .post('/api/blogs')
+                .send(new_blog)
+                .expect(401)
+
+        })
+
         test('POST request adds a blog ', async () => {
             const new_blog = {
                 title: "Tech won't save us",
@@ -84,13 +100,17 @@ describe('blogs api', () => {
                 likes: 5,
             }
 
+            const auth = await testAuth(api)
+
             const response = await api
+                .set(auth)
                 .post('/api/blogs')
                 .send(new_blog)
                 .expect(201)
                 .expect('Content-Type', /application\/json/)
 
             delete response.body.id
+            delete response.body.user
             assert.deepStrictEqual(response.body, new_blog)
 
             const response2 = await api
@@ -106,7 +126,10 @@ describe('blogs api', () => {
                 author: "Paris Marks",
                 url: "https://techwontsave.us",
             }
+
+            const auth = await testAuth(api)
             const response = await api
+                .set(auth)
                 .post('/api/blogs')
                 .send(new_blog)
                 .expect(201)
@@ -121,8 +144,10 @@ describe('blogs api', () => {
                 url: "https://techwontsave.us",
                 likes: 5,
             }
+            const auth = await testAuth(api)
 
             const response = await api
+                .set(auth)
                 .post('/api/blogs')
                 .send(new_blog)
                 .expect(400)
@@ -134,8 +159,10 @@ describe('blogs api', () => {
                 author: "Paris Marks",
                 likes: 5,
             }
+            const auth = await testAuth(api)
 
             const response = await api
+                .set(auth)
                 .post('/api/blogs')
                 .send(new_blog)
                 .expect(400)
@@ -144,11 +171,27 @@ describe('blogs api', () => {
 
     describe('deleting a blog', () => {
         test('that exists succeeds', async () => {
-            const blog = await Blog.findOne()
+            const new_blog = {
+                title: "Tech won't save us",
+                author: "Paris Marks",
+                url: "https://techwontsave.us",
+                likes: 5,
+            }
+
+            const auth = await testAuth(api)
+
+            const postResponse = await api
+                .set(auth)
+                .post('/api/blogs')
+                .send(new_blog)
+                .expect(201)
+
+            const blog = await Blog.findById(postResponse.body.id)
             const id = blog.id
             assert.notStrictEqual(id, undefined)
 
             const response = await api
+                .set(auth)
                 .delete(`/api/blogs/${id}`)
                 .expect(204)
 
@@ -161,7 +204,9 @@ describe('blogs api', () => {
 
             const state1 = await Blog.find({})
 
+            const auth = await testAuth(api)
             const response = await api
+                .set(auth)
                 .delete(`/api/blogs/${id}`)
                 .expect(204)
 
@@ -172,7 +217,9 @@ describe('blogs api', () => {
         })
 
         test('with invalid id fails', async () => {
+            const auth = await testAuth(api)
             const response = await api
+                .set(auth)
                 .delete('/api/blogs/abcdefg')
                 .expect(400)
         })

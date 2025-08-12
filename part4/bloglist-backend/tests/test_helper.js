@@ -14,4 +14,15 @@ const nonExistingBlogId = async () => {
 
 }
 
-module.exports = { nonExistingBlogId }
+const testAuth = async (api) => {
+    const response = await api
+        .post('/api/login')
+        .send({
+            username: process.env.TEST_USERNAME,
+            password: process.env.TEST_PW
+        })
+
+    return { Authorization: `Bearer ${response.body.token}` }
+}
+
+module.exports = { nonExistingBlogId, testAuth }

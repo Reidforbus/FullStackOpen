@@ -30,7 +30,7 @@ testUsers = [
 ]
 
 beforeEach(async () => {
-    await User.deleteMany({})
+    await User.deleteMany({ username: { $not: { $eq: process.env.TEST_USERNAME }}})
     const userObjects = testUsers.map(user => new User(user))
     const promises = userObjects.map(user => user.save())
     await Promise.all(promises)
@@ -40,7 +40,7 @@ describe('users api', () => {
     describe('adding a user', () => {
         test('succeeds', async () => {
             const new_user = {
-                username: 'test',
+                username: 'testtest',
                 password: 'testpw',
             }
 
