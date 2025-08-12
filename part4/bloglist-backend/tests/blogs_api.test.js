@@ -179,7 +179,7 @@ describe('blogs api', () => {
     })
 
     describe('updating a blog', () => {
-        test.only('that exists succeeds', async () => {
+        test('that exists succeeds', async () => {
             const blog = await Blog.findOne()
             const id = blog.id
             const new_likes = { likes: 321 }
@@ -194,7 +194,7 @@ describe('blogs api', () => {
             assert.notStrictEqual(result, null)
         })
 
-        test.only('that doesnt exist doesnt alter db', async () => {
+        test('that doesnt exist doesnt alter db', async () => {
             const id = await nonExistingBlogId()
             const new_likes = { likes: 321 }
 
@@ -211,7 +211,7 @@ describe('blogs api', () => {
             assert.deepStrictEqual(state1, state2)
         })
 
-        test.only('with invalid id fails', async () => {
+        test('with invalid id fails', async () => {
             const response = await api
                 .put('/api/blogs/abcdefg')
                 .expect(400)

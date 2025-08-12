@@ -4,10 +4,14 @@ const userSchema = mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        minLength: [3,' should be at least 3 characters long'],
     },
     name: String,
-    pwHash: String,
+    pwHash: {
+        type: String,
+        required: true,
+    }
 })
 
 userSchema.set('toJSON', {
