@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import blogService from '../services/blogs'
 
 const BlogForm = ({ createBlog }) => {
     const [title, setTitle] = useState('')
@@ -20,11 +19,11 @@ const BlogForm = ({ createBlog }) => {
     }
 
     return (
-        <div>
+        <div className='blogform'>
             <form onSubmit={submitHandler}>
-        Title <input type="text" name="title" value={title} onChange={({ target }) => {setTitle(target.value)}}/><br/>
-        Author <input type="text" name="author" value={author} onChange={({ target }) => {setAuthor(target.value)}}/><br/>
-        URL <input type="text" name="url" value={url} onChange={({ target }) => {setUrl(target.value)}}/><br/>
+        Title <input id="blogform-title" type="text" name="title" value={title} onChange={({ target }) => {setTitle(target.value)}}/><br/>
+        Author <input id="blogform-author" type="text" name="author" value={author} onChange={({ target }) => {setAuthor(target.value)}}/><br/>
+        URL <input id="blogform-url" type="text" name="url" value={url} onChange={({ target }) => {setUrl(target.value)}}/><br/>
                 <button type="submit">Create</button>
             </form>
         </div>

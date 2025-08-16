@@ -19,18 +19,18 @@ const Blog = ({ blog, username, handleLike, handleDelete }) => {
 
     if (viewDetails) {
         return (
-            <div style={style}>
-                <div>{blog.title} {blog.author} <button onClick={changeView}>hide</button></div>
-                <div>{blog.url}</div>
-                <div>likes: {blog.likes} <button onClick={handleLike} value={blog.id}>like</button></div>
-                <div>{blog.user.name}</div>
-                <div style={displayIfOwned}><button onClick={handleDelete} value={blog.id}>remove</button></div>
+            <div style={style} className='blog'>
+                <div className='bloginfo'>{blog.title} {blog.author} <button onClick={changeView}>hide</button></div>
+                <div className='url'>{blog.url}</div>
+                <div className='likes'>likes: {blog.likes} <button onClick={handleLike} value={blog.id}>like</button></div>
+                <div className='user'>{blog.user.name}</div>
+                <div style={displayIfOwned} className='removeButton'><button onClick={handleDelete} value={blog.id}>remove</button></div>
             </div>
         )
     } else {
         return (
-            <div style={style}>
-                {blog.title} {blog.author} <button onClick={changeView}>view</button>
+            <div style={style} className='blog'>
+                <div className='bloginfo'>{blog.title} {blog.author} <button onClick={changeView}>view</button></div>
             </div>
         )}
 }
