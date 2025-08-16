@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
 
-const BlogForm = ({popupSetter}) => {
+const BlogForm = ({ createBlog }) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
@@ -9,23 +9,24 @@ const BlogForm = ({popupSetter}) => {
     const submitHandler = async (event) => {
         event.preventDefault()
         console.log('Adding blog...', title, author, url)
-        blogService.create({
+        createBlog({
             title,
             author,
             url
         })
-        popupSetter({msg:'Added new blog', type:'ok'})
-        setTimeout(() => popupSetter(null), 3000)
+        setTitle('')
+        setAuthor('')
+        setUrl('')
     }
 
     return (
         <div>
-        <form onSubmit={submitHandler}>
-        Title <input type="text" name="title" value={title} onChange={({target}) => {setTitle(target.value)}}/><br/>
-        Author <input type="text" name="author" value={author} onChange={({target}) => {setAuthor(target.value)}}/><br/>
-        URL <input type="text" name="url" value={url} onChange={({target}) => {setUrl(target.value)}}/><br/>
-        <button type="submit">Create</button>
-        </form>
+            <form onSubmit={submitHandler}>
+        Title <input type="text" name="title" value={title} onChange={({ target }) => {setTitle(target.value)}}/><br/>
+        Author <input type="text" name="author" value={author} onChange={({ target }) => {setAuthor(target.value)}}/><br/>
+        URL <input type="text" name="url" value={url} onChange={({ target }) => {setUrl(target.value)}}/><br/>
+                <button type="submit">Create</button>
+            </form>
         </div>
     )
 }

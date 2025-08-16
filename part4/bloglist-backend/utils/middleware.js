@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 const errorHandler = (error, req, res, next) => {
+    console.log(error)
     if (error.name === 'ValidationError') {
         return res.status(400).json({ error: error.message })
     } else if (error.name === 'CastError') {
@@ -8,7 +9,6 @@ const errorHandler = (error, req, res, next) => {
     } else if (error.name === 'MongoServerError' && error.message.includes('E11000')) {
         return res.status(400).json({error: 'expected username to be unique'})
     }
-    console.log(error)
 
     next(error)
 }
