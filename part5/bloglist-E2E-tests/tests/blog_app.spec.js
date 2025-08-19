@@ -84,5 +84,27 @@ describe('Blog app', () => {
             await expect(page.getByText('remove')).not.toBeVisible()
 
         })
+
+        test('blogs are sorted in order of likes', async ({ page }) => {
+            await addBlog(page, 'Blog with', '0 likes', 'testurl.dev')
+            await addBlog(page, 'Blog with', '1 likes', 'testurl.dev')
+            await addBlog(page, 'Blog with', '2 likes', 'testurl.dev')
+
+            // Open the first blog and like it twice then hide it
+            await page.locator('.bloginfo').filter({ hasText: '2 likes' }).getByRole('button').click()
+            await page.getByRole('button', { name: 'like' }).click()
+            await page.getByRole('button', { name: 'like' }).click()
+            await page.getByText('hide').first().click()
+
+            // Open the second blog, hide the first one and like the second once
+            await page.locator('.bloginfo').filter({ hasText: '1 likes' }).getByRole('button').click()
+            await page.getByRole('button', { name: 'like' }).click()
+            await page.getByText('hide').first().click()
+
+            const result = await page.locator('.bloginfo')
+            const expectOrder = ['Blog with 2 likes view', 'Blog with 1 likes view', 'Blog with 0 likes view']
+            await expect(result).toHaveText(expectOrder)
+
+        })
     })
 })
