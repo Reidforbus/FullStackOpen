@@ -15,6 +15,15 @@ const AnecdoteForm = () => {
                 payload: `You created: '${data.content}'`
             })
             setTimeout(() => notificationDispatch({ type: 'CLEAR' }), 5000)
+        },
+        onError: (error) => {
+            const errMsg = error.response.data.error
+            console.log(errMsg)
+            notificationDispatch({
+                type: 'ADD',
+                payload: errMsg 
+            })
+            setTimeout(() => notificationDispatch({ type: 'CLEAR' }), 5000)
         }
     })
 

@@ -1,5 +1,7 @@
 import { useNotifications } from "../NotificationContext"
 
+const randomId = () => (100 * Math.random()).toFixed(0)
+
 const Notification = () => {
     const notifications = useNotifications()
 
@@ -15,7 +17,7 @@ const Notification = () => {
         <div style={style}>
         {notifications.map(note => {
             return (
-                <div>
+                <div key={randomId()}>
                 {note}
                 </div>
             )
